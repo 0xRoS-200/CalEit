@@ -17,7 +17,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Plus, Trash2, Edit2, Check, X, StickyNote } from "lucide-react";
+import { Plus, Trash2, Edit2, Check, X, StickyNote, ListChecks } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
 interface NotesPanelProps {
@@ -25,12 +26,14 @@ interface NotesPanelProps {
 }
 
 export function NotesPanel({ className }: NotesPanelProps) {
-  const { currentDate, selectedRange, notes, addNote, updateNote, deleteNote, setSelectedRange } =
+  const { currentDate, selectedRange, notes, addNote, updateNote, deleteNote, deleteNotes, setSelectedRange } =
     useCalendar();
   const [newNote, setNewNote] = useState("");
   const [eventTitle, setEventTitle] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const filteredNotes = useMemo(() => {
     const targetDate = selectedRange.start || currentDate;
@@ -70,6 +73,31 @@ export function NotesPanel({ className }: NotesPanelProps) {
     setEditContent("");
   };
 
+  const toggleSelectionMode = () => {
+    setIsSelectionMode(!isSelectionMode);
+    setSelectedIds([]);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredNotes.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredNotes.map((n) => n.id));
+    }
+  };
+
+  const toggleSelectNote = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleDeleteSelected = () => {
+    deleteNotes(selectedIds);
+    setSelectedIds([]);
+    setIsSelectionMode(false);
+  };
+
   return (
     <div
       className={cn(
@@ -89,12 +117,38 @@ export function NotesPanel({ className }: NotesPanelProps) {
               {filteredNotes.length} {filteredNotes.length === 1 ? "note" : "notes"}
             </p>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleSelectionMode}
+            className={cn(
+              "ml-auto gap-2 transition-all",
+              isSelectionMode ? "bg-primary/20 text-primary border-primary/20 border" : "text-muted-foreground"
+            )}
+          >
+            <ListChecks className="w-4 h-4" />
+            <span className="text-xs font-bold uppercase tracking-wider">
+              {isSelectionMode ? "Cancel" : "Select"}
+            </span>
+          </Button>
         </div>
-        <p className="text-sm text-muted-foreground mt-2 pl-12">
-          {selectedRange.start
-            ? formatDate(selectedRange.start)
-            : `${MONTH_NAMES[currentDate.getMonth()]} ${currentDate.getFullYear()}`}
-        </p>
+        <div className="flex items-center justify-between mt-2 pl-12">
+          <p className="text-sm text-muted-foreground">
+            {selectedRange.start
+              ? formatDate(selectedRange.start)
+              : `${MONTH_NAMES[currentDate.getMonth()]} ${currentDate.getFullYear()}`}
+          </p>
+          {isSelectionMode && filteredNotes.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase">All</span>
+              <Checkbox
+                checked={selectedIds.length === filteredNotes.length && filteredNotes.length > 0}
+                onCheckedChange={toggleSelectAll}
+                className="w-4 h-4 rounded border-primary/40 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {selectedRange.start && selectedRange.end && (
@@ -150,7 +204,7 @@ export function NotesPanel({ className }: NotesPanelProps) {
         />
         <Button
           onClick={handleAddNote}
-          disabled={!newNote.trim()}
+          disabled={!newNote.trim() || isSelectionMode}
           size="sm"
           className="w-full transition-all"
         >
@@ -177,8 +231,23 @@ export function NotesPanel({ className }: NotesPanelProps) {
               {filteredNotes.map((note) => (
                 <div
                   key={note.id}
-                  className="p-4 rounded-xl bg-muted/30 border border-border/50 hover:border-border transition-colors group"
+                  className={cn(
+                    "p-4 rounded-xl transition-all border group relative",
+                    isSelectionMode ? "cursor-pointer pl-12" : "bg-muted/30 border-border/50 hover:border-border",
+                    isSelectionMode && selectedIds.includes(note.id) ? "bg-primary/10 border-primary/30 ring-1 ring-primary/20" : "bg-muted/20 border-border/40"
+                  )}
+                  onClick={isSelectionMode ? () => toggleSelectNote(note.id) : undefined}
                 >
+                  {isSelectionMode && (
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                      <Checkbox
+                        checked={selectedIds.includes(note.id)}
+                        onCheckedChange={() => toggleSelectNote(note.id)}
+                        className="w-5 h-5 rounded-md border-primary/40 data-[state=checked]:bg-primary"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </div>
+                  )}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold px-2 py-1 rounded-md bg-primary/10 text-primary border border-primary/20">
@@ -206,47 +275,49 @@ export function NotesPanel({ className }: NotesPanelProps) {
                         )}
                       </span>
                     </div>
-                    <div className="flex gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleStartEdit(note)}
-                        className="h-7 w-7 p-0"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                        <span className="sr-only">Edit note</span>
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            <span className="sr-only">Delete note</span>
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete note?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. This will permanently
-                              delete your note.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => deleteNote(note.id)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    {!isSelectionMode && (
+                      <div className="flex gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleStartEdit(note)}
+                          className="h-7 w-7 p-0"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                          <span className="sr-only">Edit note</span>
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                             >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span className="sr-only">Delete note</span>
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete note?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will permanently
+                                delete your note.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => deleteNote(note.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    )}
                   </div>
 
                   {editingId === note.id ? (
@@ -288,6 +359,39 @@ export function NotesPanel({ className }: NotesPanelProps) {
           )}
         </div>
       </ScrollArea>
+
+      {isSelectionMode && selectedIds.length > 0 && (
+        <div className="p-4 bg-muted/50 border-t border-border animate-in slide-in-from-bottom-2 duration-300">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                className="w-full font-bold shadow-lg hover:scale-[1.01] active:scale-95 transition-all"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete {selectedIds.length} {selectedIds.length === 1 ? "Item" : "Items"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete multiple items?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  You are about to delete {selectedIds.length} selected items. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteSelected}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Delete Selected
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      )}
     </div>
   );
 }

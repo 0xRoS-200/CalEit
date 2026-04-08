@@ -10,7 +10,7 @@ import { HeroImage } from "./hero-image";
 import { CalendarGrid } from "./calendar-grid";
 import { NotesPanel } from "./notes-panel";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Moon, Sun, X, GripVertical, Maximize2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Moon, Sun, X, GripVertical, Maximize2, Github } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -365,19 +365,37 @@ export function WallCalendar() {
               </p>
             )}
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleTheme}
-            className="rounded-full w-10 h-10 transition-all hover:scale-110 active:scale-95 bg-background/50 backdrop-blur-md border-primary/20 hover:border-primary shadow-lg"
-          >
-            {isDark ? (
-              <Sun className="w-4 h-4 text-amber-500" />
-            ) : (
-              <Moon className="w-4 h-4" />
-            )}
-            <span className="sr-only">Toggle theme</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              asChild
+              className="rounded-full w-10 h-10 transition-all hover:scale-110 active:scale-95 bg-background/50 backdrop-blur-md border-primary/20 hover:border-primary shadow-lg"
+            >
+              <a 
+                href="https://github.com/0xRoS-200/CalEit" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                title="View on GitHub"
+              >
+                <Github className="w-5 h-5" />
+                <span className="sr-only">GitHub</span>
+              </a>
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleTheme}
+              className="rounded-full w-10 h-10 transition-all hover:scale-110 active:scale-95 bg-background/50 backdrop-blur-md border-primary/20 hover:border-primary shadow-lg"
+            >
+              {isDark ? (
+                <Sun className="w-4 h-4 text-amber-500" />
+              ) : (
+                <Moon className="w-4 h-4" />
+              )}
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </div>
         </div>
       </header>
 

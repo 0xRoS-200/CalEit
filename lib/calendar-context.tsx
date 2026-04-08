@@ -25,6 +25,7 @@ interface CalendarContextType {
   addNote: (date: Date, content: string, endDate?: Date | null) => void;
   updateNote: (id: string, content: string) => void;
   deleteNote: (id: string) => void;
+  deleteNotes: (ids: string[]) => void;
   toggleTheme: () => void;
   goToNextMonth: () => void;
   goToPrevMonth: () => void;
@@ -141,6 +142,10 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     setNotes((prev) => prev.filter((note) => note.id !== id));
   }, []);
 
+  const deleteNotes = useCallback((ids: string[]) => {
+    setNotes((prev) => prev.filter((note) => !ids.includes(note.id)));
+  }, []);
+
   const toggleTheme = useCallback(() => {
     setIsDark((prev) => !prev);
   }, []);
@@ -173,6 +178,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         addNote,
         updateNote,
         deleteNote,
+        deleteNotes,
         toggleTheme,
         goToNextMonth,
         goToPrevMonth,
