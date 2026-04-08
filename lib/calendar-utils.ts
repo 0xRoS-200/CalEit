@@ -35,7 +35,6 @@ export function getCalendarDays(year: number, month: number): CalendarDay[] {
 
   const days: CalendarDay[] = [];
 
-  // Previous month days
   const prevMonth = new Date(year, month, 0);
   const daysInPrevMonth = prevMonth.getDate();
   for (let i = startingDayOfWeek - 1; i >= 0; i--) {
@@ -50,7 +49,6 @@ export function getCalendarDays(year: number, month: number): CalendarDay[] {
     });
   }
 
-  // Current month days
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
     const dateString = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
@@ -63,8 +61,7 @@ export function getCalendarDays(year: number, month: number): CalendarDay[] {
     });
   }
 
-  // Next month days to fill the grid
-  const remainingDays = 42 - days.length; // 6 rows * 7 days
+  const remainingDays = 42 - days.length;
   for (let day = 1; day <= remainingDays; day++) {
     const date = new Date(year, month + 1, day);
     days.push({
@@ -132,66 +129,65 @@ export function formatMonthYear(date: Date): string {
   return `${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
 }
 
-// Month images - landscape photography for each month
 export const MONTH_IMAGES: Record<number, { url: string; alt: string; credit: string }> = {
   0: {
-    url: "https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=1200&h=800&fit=crop",
-    alt: "Winter mountain landscape",
-    credit: "Photo by Unsplash",
+    url: "/images/hollow-knight/jan.png",
+    alt: "Hollow Knight - The Knight",
+    credit: "Generated Content",
   },
   1: {
-    url: "https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=1200&h=800&fit=crop",
-    alt: "Snowy forest path",
-    credit: "Photo by Unsplash",
+    url: "/images/hollow-knight/feb.png",
+    alt: "Hollow Knight - Dirtmouth",
+    credit: "Generated Content",
   },
   2: {
-    url: "https://images.unsplash.com/photo-1462275646964-a0e3571f4f0f?w=1200&h=800&fit=crop",
-    alt: "Spring cherry blossoms",
-    credit: "Photo by Unsplash",
+    url: "/images/hollow-knight/mar.png",
+    alt: "Hollow Knight - Greenpath",
+    credit: "Generated Content",
   },
   3: {
-    url: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1200&h=800&fit=crop",
-    alt: "Spring flower field",
-    credit: "Photo by Unsplash",
+    url: "/images/hollow-knight/apr.png",
+    alt: "Hollow Knight - City of Tears",
+    credit: "Generated Content",
   },
   4: {
-    url: "https://images.unsplash.com/photo-1495107334309-fcf20504a5ab?w=1200&h=800&fit=crop",
-    alt: "May meadow sunrise",
-    credit: "Photo by Unsplash",
+    url: "/images/hollow-knight/may.png",
+    alt: "Hollow Knight - Crystal Peak",
+    credit: "Generated Content",
   },
   5: {
-    url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&h=800&fit=crop",
-    alt: "Summer beach sunset",
-    credit: "Photo by Unsplash",
+    url: "/images/hollow-knight/jun.png",
+    alt: "Hollow Knight - Resting Grounds",
+    credit: "Generated Content",
   },
   6: {
-    url: "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=1200&h=800&fit=crop",
-    alt: "Lavender fields",
-    credit: "Photo by Unsplash",
+    url: "/images/hollow-knight/jul.png",
+    alt: "Hollow Knight - Deepnest",
+    credit: "Generated Content",
   },
   7: {
-    url: "https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=1200&h=800&fit=crop",
-    alt: "Golden wheat field",
-    credit: "Photo by Unsplash",
+    url: "/images/hollow-knight/aug.png",
+    alt: "Hollow Knight - Kingdom's Edge",
+    credit: "Generated Content",
   },
   8: {
-    url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=800&fit=crop",
-    alt: "Early autumn forest",
-    credit: "Photo by Unsplash",
+    url: "/images/hollow-knight/sep.png",
+    alt: "Hollow Knight - Ancient Basin",
+    credit: "Generated Content",
   },
   9: {
-    url: "https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=1200&h=800&fit=crop",
-    alt: "Autumn leaves landscape",
-    credit: "Photo by Unsplash",
+    url: "/images/hollow-knight/oct.png",
+    alt: "Hollow Knight - The Abyss",
+    credit: "Generated Content",
   },
   10: {
-    url: "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=1200&h=800&fit=crop",
-    alt: "Misty autumn morning",
-    credit: "Photo by Unsplash",
+    url: "/images/hollow-knight/nov.png",
+    alt: "Hollow Knight - Pantheon",
+    credit: "Generated Content",
   },
   11: {
-    url: "https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=1200&h=800&fit=crop",
-    alt: "Winter wonderland",
-    credit: "Photo by Unsplash",
+    url: "/images/hollow-knight/dec.png",
+    alt: "Hollow Knight - Final Challenge",
+    credit: "Generated Content",
   },
 };

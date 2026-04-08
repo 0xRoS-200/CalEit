@@ -36,7 +36,6 @@ export function HeroImage({
       const nextPage = nextPageRef.current;
       const shadow = shadowRef.current;
 
-      // Set initial state for pages
       gsap.set(nextPage, {
         rotationX: direction === "next" ? -180 : 180,
         transformOrigin: direction === "next" ? "top center" : "bottom center",
@@ -55,7 +54,6 @@ export function HeroImage({
         opacity: 0,
       });
 
-      // Create the page flip animation with realistic paper curl
       const tl = gsap.timeline({
         onComplete: () => {
           setDisplayMonth(month);
@@ -65,17 +63,17 @@ export function HeroImage({
         },
       });
 
-      // Animate current page lifting and flipping
       tl.to(currentPage, {
         rotationX: direction === "next" ? 180 : -180,
+        skewX: direction === "next" ? -5 : 5,
         duration: 0.8,
         ease: "power2.inOut",
+        force3D: true,
       })
-        // Animate shadow growing as page lifts
         .to(
           shadow,
           {
-            opacity: 0.3,
+            opacity: 0.4,
             duration: 0.4,
             ease: "power2.in",
           },
@@ -90,17 +88,17 @@ export function HeroImage({
           },
           0.4
         )
-        // Bring next page into view
         .to(
           nextPage,
           {
             rotationX: 0,
+            skewX: 0,
             duration: 0.8,
-            ease: "power2.inOut",
+            ease: "back.out(1.2)",
+            force3D: true,
           },
           0
         )
-        // Fade out current page as it completes flip
         .to(
           currentPage,
           {
@@ -117,20 +115,19 @@ export function HeroImage({
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-[16/10] overflow-hidden rounded-t-lg"
+      className="relative w-full aspect-[2/1] overflow-hidden rounded-t-lg flex-shrink-0 bg-black"
       style={{ perspective: "1200px" }}
     >
-      {/* Next page (underneath) - shown during flip */}
       <div
         ref={nextPageRef}
-        className="absolute inset-0"
+        className="absolute inset-0 h-full w-full"
         style={{ 
           backfaceVisibility: "hidden", 
           transformStyle: "preserve-3d",
           transformOrigin: direction === "next" ? "top center" : "bottom center"
         }}
       >
-        <div className="relative w-full h-full">
+        <div className="relative w-full h-full min-h-full">
           <Image
             src={nextImage.url}
             alt={nextImage.alt}
@@ -138,28 +135,30 @@ export function HeroImage({
             className="object-cover"
             priority
           />
-          {/* Month overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-          <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
-            <h2 className="text-2xl md:text-4xl font-serif font-bold text-white drop-shadow-lg">
-              {MONTH_NAMES[month]}
-            </h2>
-            <p className="text-sm md:text-base text-white/80 drop-shadow-md">
-              {year}
-            </p>
+          <div className="absolute inset-0 bg-black/20" />
+          
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className="backdrop-blur-md bg-black/40 px-8 py-4 rounded-2xl border border-white/10 shadow-2xl flex flex-col items-center transform -translate-y-2">
+              <h2 className="text-3xl md:text-5xl font-serif font-bold text-white tracking-[0.2em] uppercase drop-shadow-2xl">
+                {MONTH_NAMES[month]}
+              </h2>
+              <div className="h-[1px] w-12 bg-white/30 my-3" />
+              <p className="text-base md:text-lg font-light text-white/90 tracking-[0.5em] uppercase drop-shadow-lg">
+                {year}
+              </p>
+            </div>
           </div>
-          {/* Photo credit */}
-          <p className="absolute bottom-2 right-2 text-xs text-white/60">
+
+          <p className="absolute bottom-2 right-4 text-[10px] text-white/40 tracking-widest uppercase">
             {nextImage.credit}
           </p>
         </div>
       </div>
 
-      {/* Current page (on top) */}
       <div
         ref={currentPageRef}
         className={cn(
-          "absolute inset-0",
+          "absolute inset-0 h-full w-full",
           isFlipping ? "pointer-events-none" : ""
         )}
         style={{ 
@@ -168,7 +167,7 @@ export function HeroImage({
           transformOrigin: direction === "next" ? "top center" : "bottom center"
         }}
       >
-        <div className="relative w-full h-full">
+        <div className="relative w-full h-full min-h-full">
           <Image
             src={currentImage.url}
             alt={currentImage.alt}
@@ -176,42 +175,41 @@ export function HeroImage({
             className="object-cover"
             priority
           />
-          {/* Month overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-          <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
-            <h2 className="text-2xl md:text-4xl font-serif font-bold text-white drop-shadow-lg">
-              {MONTH_NAMES[displayMonth]}
-            </h2>
-            <p className="text-sm md:text-base text-white/80 drop-shadow-md">
-              {year}
-            </p>
+          <div className="absolute inset-0 bg-black/20" />
+          
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className="backdrop-blur-md bg-black/40 px-8 py-4 rounded-2xl border border-white/10 shadow-2xl flex flex-col items-center transform -translate-y-2">
+              <h2 className="text-3xl md:text-5xl font-serif font-bold text-white tracking-[0.2em] uppercase drop-shadow-2xl">
+                {MONTH_NAMES[displayMonth]}
+              </h2>
+              <div className="h-[1px] w-12 bg-white/30 my-3" />
+              <p className="text-base md:text-lg font-light text-white/90 tracking-[0.5em] uppercase drop-shadow-lg">
+                {year}
+              </p>
+            </div>
           </div>
-          {/* Photo credit */}
-          <p className="absolute bottom-2 right-2 text-xs text-white/60">
+
+          <p className="absolute bottom-2 right-4 text-[10px] text-white/40 tracking-widest uppercase">
             {currentImage.credit}
           </p>
-          {/* Paper edge effect */}
-          <div className="absolute inset-y-0 right-0 w-1 bg-gradient-to-l from-black/10 to-transparent" />
+          <div className="absolute inset-y-0 right-0 w-1 bg-gradient-to-l from-black/20 to-transparent" />
         </div>
       </div>
 
-      {/* Dynamic shadow during flip */}
       <div
         ref={shadowRef}
-        className="absolute inset-0 bg-black/30 pointer-events-none"
+        className="absolute inset-0 bg-black/40 pointer-events-none"
         style={{ opacity: 0 }}
       />
 
-      {/* Paper texture overlay */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay"
+      <div className="absolute inset-0 pointer-events-none opacity-[0.05] mix-blend-overlay"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
         }}
       />
 
-      {/* Page fold shadow hint */}
       {!isFlipping && (
-        <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/5 to-transparent pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-10 bg-gradient-to-b from-black/10 to-transparent pointer-events-none" />
       )}
     </div>
   );

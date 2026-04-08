@@ -18,25 +18,35 @@ const _playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Wall Calendar - Interactive Calendar with Notes',
-  description: 'A beautiful, interactive wall calendar with page-flip animations, date range selection, and persistent notes. Features light and dark mode support.',
-  generator: 'v0.app',
+  title: 'Wall Calendar - Interactive Hollow Knight Planner',
+  description: 'A beautiful, interactive wall calendar with Hollow Knight aesthetics, page-flip animations, and persistent notes.',
+  generator: 'Wall Calendar',
+  metadataBase: new URL('http://localhost:3000'),
   icons: {
-    icon: [
+    icon: '/logo.svg',
+    apple: '/logo.svg',
+  },
+  openGraph: {
+    title: 'Wall Calendar - Interactive Hollow Knight Planner',
+    description: 'A beautiful, interactive wall calendar with Hollow Knight aesthetics, page-flip animations, and persistent notes.',
+    url: 'http://localhost:3000',
+    siteName: 'Wall Calendar',
+    images: [
       {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
+        url: '/images/hollow-knight/dec.png',
+        width: 1200,
+        height: 630,
+        alt: 'Wall Calendar Preview',
       },
     ],
-    apple: '/apple-icon.png',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Wall Calendar - Interactive Hollow Knight Planner',
+    description: 'A beautiful, interactive wall calendar with Hollow Knight aesthetics, page-flip animations, and persistent notes.',
+    images: ['/images/hollow-knight/dec.png'],
   },
 }
 

@@ -10,6 +10,7 @@ export interface DateRange {
 export interface CalendarNote {
   id: string;
   date: string;
+  endDate?: string;
   content: string;
   createdAt: string;
 }
@@ -21,7 +22,7 @@ interface CalendarContextType {
   isDark: boolean;
   setCurrentDate: (date: Date) => void;
   setSelectedRange: (range: DateRange) => void;
-  addNote: (date: Date, content: string) => void;
+  addNote: (date: Date, content: string, endDate?: Date | null) => void;
   updateNote: (id: string, content: string) => void;
   deleteNote: (id: string) => void;
   toggleTheme: () => void;
@@ -37,14 +38,12 @@ const STORAGE_KEYS = {
   THEME: "wall-calendar-theme",
 };
 
-// Create a stable initial date for SSR (first day of current month at midnight UTC)
 function getInitialDate() {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), 1);
 }
 
 export function CalendarProvider({ children }: { children: React.ReactNode }) {
-  // Use a function to lazily initialize the date to avoid hydration mismatch
   const [currentDate, setCurrentDate] = useState(() => getInitialDate());
   const [selectedRange, setSelectedRangeState] = useState<DateRange>({
     start: null,
@@ -54,20 +53,16 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
   const [isDark, setIsDark] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Load state from localStorage on mount (client-side only)
   useEffect(() => {
-    // Set actual current date on client
     setCurrentDate(new Date());
     
     const loadFromStorage = () => {
       try {
-        // Load notes
         const storedNotes = localStorage.getItem(STORAGE_KEYS.NOTES);
         if (storedNotes) {
           setNotes(JSON.parse(storedNotes));
         }
 
-        // Load selected range
         const storedRange = localStorage.getItem(STORAGE_KEYS.SELECTED_RANGE);
         if (storedRange) {
           const parsed = JSON.parse(storedRange);
@@ -77,14 +72,12 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
           });
         }
 
-        // Load theme - check system preference if no stored value
         const storedTheme = localStorage.getItem(STORAGE_KEYS.THEME);
         if (storedTheme !== null) {
           const dark = JSON.parse(storedTheme);
           setIsDark(dark);
           document.documentElement.classList.toggle("dark", dark);
         } else {
-          // Check system preference
           const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
           setIsDark(prefersDark);
           document.documentElement.classList.toggle("dark", prefersDark);
@@ -98,14 +91,12 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     loadFromStorage();
   }, []);
 
-  // Save notes to localStorage
   useEffect(() => {
     if (isHydrated) {
       localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notes));
     }
   }, [notes, isHydrated]);
 
-  // Save selected range to localStorage
   useEffect(() => {
     if (isHydrated) {
       localStorage.setItem(
@@ -118,7 +109,6 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     }
   }, [selectedRange, isHydrated]);
 
-  // Save theme to localStorage
   useEffect(() => {
     if (isHydrated) {
       localStorage.setItem(STORAGE_KEYS.THEME, JSON.stringify(isDark));
@@ -130,10 +120,11 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     setSelectedRangeState(range);
   }, []);
 
-  const addNote = useCallback((date: Date, content: string) => {
+  const addNote = useCallback((date: Date, content: string, endDate?: Date | null) => {
     const newNote: CalendarNote = {
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       date: date.toISOString().split("T")[0],
+      endDate: endDate ? endDate.toISOString().split("T")[0] : undefined,
       content,
       createdAt: new Date().toISOString(),
     };

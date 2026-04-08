@@ -25,13 +25,13 @@ interface NotesPanelProps {
 }
 
 export function NotesPanel({ className }: NotesPanelProps) {
-  const { currentDate, selectedRange, notes, addNote, updateNote, deleteNote } =
+  const { currentDate, selectedRange, notes, addNote, updateNote, deleteNote, setSelectedRange } =
     useCalendar();
   const [newNote, setNewNote] = useState("");
+  const [eventTitle, setEventTitle] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
 
-  // Filter notes for current month or selected date
   const filteredNotes = useMemo(() => {
     const targetDate = selectedRange.start || currentDate;
     const monthYear = `${targetDate.getFullYear()}-${String(
@@ -77,7 +77,6 @@ export function NotesPanel({ className }: NotesPanelProps) {
         className
       )}
     >
-      {/* Header */}
       <div className="p-4 md:p-5 border-b border-border bg-muted/30">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -97,7 +96,44 @@ export function NotesPanel({ className }: NotesPanelProps) {
         </p>
       </div>
 
-      {/* Add note form */}
+      {selectedRange.start && selectedRange.end && (
+        <div className="p-4 bg-primary/5 border-b border-border">
+          <div className="flex items-center justify-between mb-3 text-xs font-bold text-primary tracking-widest uppercase">
+            <span>Selected Range</span>
+            <span className="bg-primary/10 px-2 py-0.5 rounded">Event Mode</span>
+          </div>
+          <div className="space-y-3">
+            <input
+              type="text"
+              placeholder="Event Name (e.g. Vacation)"
+              value={eventTitle}
+              onChange={(e) => setEventTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  addNote(selectedRange.start!, eventTitle.trim() || "New Event", selectedRange.end);
+                  setSelectedRange({ start: null, end: null });
+                  setEventTitle("");
+                }
+              }}
+              className="w-full bg-background border border-primary/20 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              autoFocus
+            />
+            <Button
+              onClick={() => {
+                addNote(selectedRange.start!, eventTitle.trim() || "New Event", selectedRange.end);
+                setSelectedRange({ start: null, end: null });
+                setEventTitle("");
+              }}
+              size="sm"
+              className="w-full shadow-lg hover:scale-[1.02] active:scale-95 transition-all bg-primary text-primary-foreground font-bold"
+            >
+              <Check className="w-4 h-4 mr-2" />
+              Save Range as Event
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="p-4 border-b border-border">
         <Textarea
           placeholder="Write your note here..."
@@ -123,7 +159,6 @@ export function NotesPanel({ className }: NotesPanelProps) {
         </Button>
       </div>
 
-      {/* Notes list */}
       <ScrollArea className="flex-1">
         <div className="p-4">
           {filteredNotes.length === 0 ? (
@@ -143,19 +178,33 @@ export function NotesPanel({ className }: NotesPanelProps) {
                   key={note.id}
                   className="p-4 rounded-xl bg-muted/30 border border-border/50 hover:border-border transition-colors group"
                 >
-                  {/* Note date badge */}
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium px-2 py-1 rounded-md bg-background text-muted-foreground">
-                      {new Date(note.date + "T00:00:00").toLocaleDateString(
-                        "en-US",
-                        {
-                          weekday: "short",
-                          month: "short",
-                          day: "numeric",
-                        }
-                      )}
-                    </span>
-                    {/* Actions - shown on hover on desktop */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold px-2 py-1 rounded-md bg-primary/10 text-primary border border-primary/20">
+                        {note.endDate ? "EVENT" : "NOTE"}
+                      </span>
+                      <span className="text-xs font-medium px-2 py-1 rounded-md bg-background text-muted-foreground">
+                        {new Date(note.date + "T00:00:00").toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                          }
+                        )}
+                        {note.endDate && (
+                          <>
+                            <span className="mx-1 opacity-50">→</span>
+                            {new Date(note.endDate + "T00:00:00").toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )}
+                          </>
+                        )}
+                      </span>
+                    </div>
                     <div className="flex gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
                       <Button
                         size="sm"
@@ -200,7 +249,6 @@ export function NotesPanel({ className }: NotesPanelProps) {
                   </div>
 
                   {editingId === note.id ? (
-                    /* Edit mode */
                     <div className="space-y-3">
                       <Textarea
                         value={editContent}
@@ -231,7 +279,6 @@ export function NotesPanel({ className }: NotesPanelProps) {
                       </div>
                     </div>
                   ) : (
-                    /* View mode */
                     <p className="text-sm whitespace-pre-wrap leading-relaxed">{note.content}</p>
                   )}
                 </div>
