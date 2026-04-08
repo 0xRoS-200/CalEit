@@ -402,12 +402,9 @@ export function WallCalendar() {
           >
             <div 
               className={cn(
-                "relative bg-calendar-paper rounded-xl overflow-hidden transition-all duration-500 h-auto flex flex-col",
+                "relative bg-calendar-paper rounded-xl overflow-hidden transition-all duration-500 h-auto flex flex-col glow-masterpiece",
                 "shadow-[0_8px_30px_-4px_rgba(0,0,0,0.15),0_16px_60px_-8px_rgba(0,0,0,0.15)]",
-                isZoomedIn 
-                  ? "dark:shadow-[0_0_80px_-10px_rgba(59,130,246,0.3)] shadow-[0_0_50px_-10px_rgba(0,0,0,0.1)]" 
-                  : "dark:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5),0_16px_60px_-8px_rgba(0,0,0,0.4)]",
-                !isZoomedIn && "hover:shadow-[0_12px_40px_-4px_rgba(0,0,0,0.2),0_20px_70px_-8px_rgba(0,0,0,0.2)]"
+                !isZoomedIn && "hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.2)]"
               )}
             >
               {!isZoomedIn && !isMobile && (

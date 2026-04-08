@@ -218,6 +218,42 @@ html.dark {
   color-scheme: dark;
 }
 
+/* Masterpiece Aurora Color-Shuffling Glow */
+@keyframes aurora-shuffle {
+  0%, 100% {
+    box-shadow: 
+      0 0 40px -5px rgba(79, 70, 229, 0.45),
+      0 0 60px -10px rgba(139, 92, 246, 0.4),
+      0 0 80px -15px rgba(59, 130, 246, 0.35);
+  }
+  25% {
+    box-shadow: 
+      0 0 40px -5px rgba(59, 130, 246, 0.45),
+      0 0 60px -10px rgba(6, 182, 212, 0.4),
+      0 0 80px -15px rgba(45, 212, 191, 0.35);
+  }
+  50% {
+    box-shadow: 
+      0 0 40px -5px rgba(168, 85, 247, 0.45),
+      0 0 60px -10px rgba(236, 72, 153, 0.4),
+      0 0 80px -15px rgba(139, 92, 246, 0.35);
+  }
+  75% {
+    box-shadow: 
+      0 0 40px -5px rgba(6, 182, 212, 0.45),
+      0 0 60px -10px rgba(59, 130, 246, 0.4),
+      0 0 80px -15px rgba(79, 70, 229, 0.35);
+  }
+}
+
+.glow-masterpiece {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .glow-masterpiece {
+  animation: aurora-shuffle 10s ease-in-out infinite;
+}
+
 /* Paper texture effect */
 .paper-texture {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");

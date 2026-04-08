@@ -73,7 +73,8 @@ export function NotesPanel({ className }: NotesPanelProps) {
   return (
     <div
       className={cn(
-        "flex flex-col h-full bg-card rounded-xl border border-border shadow-sm overflow-hidden transition-all",
+        "flex flex-col h-full bg-card rounded-xl border border-border shadow-sm overflow-hidden transition-all glow-masterpiece",
+        "dark:border-primary/20",
         className
       )}
     >
